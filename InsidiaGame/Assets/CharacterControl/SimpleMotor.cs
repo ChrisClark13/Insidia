@@ -99,10 +99,13 @@ public class SimpleMotor : MonoBehaviour {
         //Check to see if we collided with the ground.
         if ((characterController.collisionFlags & CollisionFlags.Below) != 0)
         {
+            //If we collided with the ground, then we're grounded.
             grounded = true;
+            //Also set y velocity to zero.
             yVelocity = 0f;
         }
         else
+            //otherwise, we're not grounded
             grounded = false;
     }
 

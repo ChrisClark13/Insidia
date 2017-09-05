@@ -93,7 +93,13 @@ public class GameCharacter : MonoBehaviour {
     private Quaternion lastRotiation = Quaternion.identity;
     private Vector3 nextPosition = Vector3.zero;
     private Quaternion nextRotation = Quaternion.identity;
+    private bool interpolating = false;
 
+    /// <summary>
+    /// Disable if the position of the character needs to be controlled by something other than a script running via OnMovementUpdate.
+    /// </summary>
+    [Tooltip("Disable if the position of the character needs to be controlled by something other than a script running via OnMovementUpdate.")]
+    public bool interpolatePosition = true;
     /// <summary>
     /// Disable if the rotation of the character needs to be controlled by something other than a script running via OnMovementUpdate.
     /// </summary>
@@ -136,16 +142,30 @@ public class GameCharacter : MonoBehaviour {
 
     private bool DoInterpolation()
     {
-        float periodLength = nextMovementUpdate - lastMovementUpdate;
-        //Calculate the fractional amount (between 0 and 1) of how far along we are in the interpolation.
-        float t = (Time.time - lastMovementUpdate) / periodLength;
+        if (interpolating)
+        {
+            float periodLength = nextMovementUpdate - lastMovementUpdate;
+            //Calculate the fractional amount (between 0 and 1) of how far along we are in the interpolation.
+            float t = (Time.time - lastMovementUpdate) / periodLength;
 
-        //Debug.Log(lastMovementUpdate + " " + Time.time + " " + nextMovementUpdate + " " + t + " " + periodLength);
+            //Debug.Log(lastMovementUpdate + " " + Time.time + " " + nextMovementUpdate + " " + t + " " + periodLength);
+            if (interpolatePosition)
+                transform.localPosition = Vector3.Lerp(lastPosition, nextPosition, t);
+            if (interpolateRotation)
+                transform.localRotation = Quaternion.Slerp(lastRotiation, nextRotation, t);
 
-        transform.localPosition = Vector3.Lerp(lastPosition, nextPosition, t);
-        if (interpolateRotation)
-            transform.localRotation = Quaternion.Slerp(lastRotiation, nextRotation, t);
+            return (t >= 1f);
+        }
+        else
+            return true;
+    }
 
-        return (t >= 1f);
+    /// <summary>
+    /// Use in a script if you need to suddenly set a gameCharacter's position and/or rotation.
+    /// On the next frame, interpolation will resume for the gameCharacter.
+    /// </summary>
+    public void EndInterpolation()
+    {
+        interpolating = false;
     }
 }
