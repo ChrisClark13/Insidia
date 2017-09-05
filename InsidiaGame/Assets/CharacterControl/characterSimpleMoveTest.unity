@@ -352,7 +352,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1754615320}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6999999, z: -3.3500001}
+  m_LocalPosition: {x: 0, y: 1.6999999, z: -4.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1893535427}
@@ -390,14 +390,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f2192cb83e20e438ed16eb666bab26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _input:
-    _move: {x: 0, y: 0}
-    _aim: {x: 0, y: 0}
-    _jump: 0
-    _meleeLight: 0
-    _meleeHeavy: 0
-    _fire: 0
-    _special: 0
   interpolateRotation: 1
 --- !u!4 &1893535427
 Transform:
@@ -483,7 +475,10 @@ MonoBehaviour:
   gameCharacter: {fileID: 1893535426}
   moveInputHorz: Horizontal
   moveInputVert: Vertical
+  aimInputHorz: Mouse X
+  aimInputVert: Mouse Y
   jumpInput: Jump
+  sprintInput: Fire3
 --- !u!114 &1893535432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,7 +491,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  sprintSpeed: 10
+  turnSpeed: 1
   jumpStrength: 10
   yVelocity: 0
   gravity: 10
   grounded: 0
+  terminalVelocity: -20

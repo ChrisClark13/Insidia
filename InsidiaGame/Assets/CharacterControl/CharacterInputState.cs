@@ -3,131 +3,59 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Use this class (referenced as the Input property inside the GameCharacter class) to check the character's inputs.
+/// <para>You will need to subscribe to an input's delegate if you need to know when it is pressed/released as opposed to just needing whatever value the input happens to be at at the time.</para>
+/// How to get an input: "gameCharacter.Input.[input name];" (Allows for implict conversion using some C# wizardry. Referencing the Value property itself is also possible.)<para></para>
+/// How to set an input: "gamecharacter.Input.[input name].Value = value;"<para></para>
+/// How to subscribe to an input delegate: "gameCharacter.Input.[input name].OnChange += [subscriber function];"<para></para>
+/// How to unsubscribe to an input delegate: "gameCharacter.Input.[input name].OnChange -= [subscriber function];"
+/// </summary>
 [Serializable]
 public class CharacterInputState
 {
-    /* Copy-paste this block for each seperate CharacterInput button/axis/etc.
-    private Vector2 _move;
-    public Vector2 Move { get { return _move; } set { if (value != _move && OnMoveChange != null) { _move = value; OnMoveChange(_move); } } }
-    public Action<Vector2> OnMoveChange;
-    */
-
-    [SerializeField]
-    private Vector2 _move;
-    public Vector2 Move
+    [Serializable]
+    public class Input<T>
     {
-        get { return _move; }
-        set
+        [SerializeField]
+        private T _value;
+        /// <summary>
+        /// The value of this input. Triggers the OnChange event when set.
+        /// </summary>
+        public T Value
         {
-            if (value != _move)
-            {
-                _move = value;
-                if (OnMoveChange != null)
-                    OnMoveChange(_move);
-            }
+            get { return _value; }
+            set { if (!_value.Equals(value))
+                {
+                    _value = value;
+                    if (OnChange != null)
+                        OnChange(_value);
+                } }
+        }
+
+        public event Action<T> OnChange;
+
+        public static implicit operator T(Input<T> input) {
+            return input._value;
         }
     }
-    public Action<Vector2> OnMoveChange;
 
-    [SerializeField]
-    private Vector2 _aim;
-    public Vector2 Aim
-    {
-        get { return _aim; }
-        set
-        {
-            if (value != _aim)
-            {
-                _aim = value;
-                if (OnAimChange != null)
-                    OnAimChange(_aim);
-            }
-        }
-    }
-    public Action<Vector2> OnAimChange;
+    public Input<Vector2> Move { get; private set; }
+    public Input<Vector2> Aim { get; private set; }
+    public Input<bool> Jump { get; private set; }
+    public Input<bool> Sprint { get; private set; }
+    public Input<bool> MeleeLight { get; private set; }
+    public Input<bool> MeleeHeavy { get; private set; }
+    public Input<bool> Special { get; private set; }
 
-    [SerializeField]
-    private bool _jump;
-    public bool Jump
+    public CharacterInputState()
     {
-        get { return _jump; }
-        set
-        {
-            if (value != _jump)
-            {
-                _jump = value;
-                if (OnJumpChange != null)
-                    OnJumpChange(_jump);
-            }
-        }
+        Move = new Input<Vector2>();
+        Aim = new Input<Vector2>();
+        Jump = new Input<bool>();
+        Sprint = new Input<bool>();
+        MeleeLight = new Input<bool>();
+        MeleeHeavy = new Input<bool>();
+        Special = new Input<bool>();
     }
-    public Action<bool> OnJumpChange;
-
-    [SerializeField]
-    private bool _meleeLight;
-    public bool MeleeLight
-    {
-        get { return _meleeLight; }
-        set
-        {
-            if (value != _meleeLight)
-            {
-                _meleeLight = value;
-                if (OnMeleeLightChange != null)
-                    OnMeleeLightChange(_meleeLight);
-            }
-        }
-    }
-    public Action<bool> OnMeleeLightChange;
-
-    [SerializeField]
-    private bool _meleeHeavy;
-    public bool MeleeHeavy
-    {
-        get { return _meleeHeavy; }
-        set
-        {
-            if (value != _meleeHeavy)
-            {
-                _meleeHeavy = value;
-                if (OnMeleeHeavyChange != null)
-                    OnMeleeHeavyChange(_meleeHeavy);
-            }
-        }
-    }
-    public Action<bool> OnMeleeHeavyChange;
-
-    [SerializeField]
-    private bool _fire;
-    public bool Fire
-    {
-        get { return _fire; }
-        set
-        {
-            if (value != _fire)
-            {
-                _fire = value;
-                if (OnFireChange != null)
-                    OnFireChange(_fire);
-            }
-        }
-    }
-    public Action<bool> OnFireChange;
-
-    [SerializeField]
-    private bool _special;
-    public bool Special
-    {
-        get { return _special; }
-        set
-        {
-            if (value != _special)
-            {
-                _special = value;
-                if (OnSpecialChange != null)
-                    OnSpecialChange(_special);
-            }
-        }
-    }
-    public Action<bool> OnSpecialChange;
 }

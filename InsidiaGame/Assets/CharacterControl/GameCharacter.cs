@@ -11,20 +11,35 @@ public class GameCharacter : MonoBehaviour {
 
     [SerializeField]
     private CharacterInputState _input = new CharacterInputState();
+    /// <summary>
+    /// Use this variable to check the character's inputs.
+    /// <para>You will need to subscribe to an input's delegate if you need to know when it is pressed/released as opposed to just needing whatever value the input happens to be at at the time.</para>
+    /// How to get an input: "gameCharacter.Input.[input name];" (Allows for implict conversion using some C# wizardry. Referencing the Value property itself is also possible.)<para></para>
+    /// How to set an input: "gamecharacter.Input.[input name].Value = value;"<para></para>
+    /// How to subscribe to an input delegate: "gameCharacter.Input.[input name].OnChange += [subscriber function];"<para></para>
+    /// How to unsubscribe to an input delegate: "gameCharacter.Input.[input name].OnChange -= [subscriber function];"
+    /// </summary>
     public CharacterInputState Input { get { return _input; } }
 
     /// <summary>
-    /// A delegate for functionst that are expensive and/or don't need to be run very often. Use instead of Update(). Runs 10 times a second.
+    /// Used for coroutine driven updates.
     /// </summary>
-    public Action<GameCharacter, float> OnSlowUpdate;
+    /// <param name="deltaTime">The amount of time that's passed between each call to this delegate.</param>
+    public delegate void OnCoroutineUpdate(GameCharacter sender, float deltaTime);
+
     /// <summary>
-    /// A delegate for functions that are cheap and/or need to be run very often. Use instead of Update(). Runs 40 times a second.
+    /// An event for functions that are expensive and/or don't need to be run very often. Use instead of Update(). Runs 10 times a second.
     /// </summary>
-    public Action<GameCharacter, float> OnFastUpdate;
+    public event OnCoroutineUpdate OnSlowUpdate;
     /// <summary>
-    /// A delegate for functions that move the GameCharacter. Uses interpolation to smooth out the frames inbetween updates. Runs 20 times a second.
+    /// An event for functions that are cheap and/or need to be run very often. Use instead of Update(). Runs 40 times a second.
     /// </summary>
-    public Action<GameCharacter, float> OnMovementUpdate;
+    public event OnCoroutineUpdate OnFastUpdate;
+    /// <summary>
+    /// An event for functions that move the GameCharacter. Uses interpolation of both position and rotation to smooth out the frames inbetween updates. Runs 20 times a second.<para></para>
+    /// Primarily the GameCharacter's position and rotation should be changed by subscribers of this event.
+    /// </summary>
+    public event OnCoroutineUpdate OnMovementUpdate;
 
     private Coroutine slowUpdate;
     private Coroutine fastUpdate;
@@ -51,7 +66,9 @@ public class GameCharacter : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(waitPeriod);
-            if (OnSlowUpdate != null) OnSlowUpdate(this, Time.time - last);
+            if (OnSlowUpdate != null)
+                //Calculate delta time. (The amount of time that has passed between calls to this coroutine.)
+                OnSlowUpdate(this, Time.time - last);
             last = Time.time;
         }
     }
@@ -63,12 +80,13 @@ public class GameCharacter : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(waitPeriod);
-            if (OnFastUpdate != null) OnFastUpdate(this, Time.time - last);
+            if (OnFastUpdate != null)
+                OnFastUpdate(this, Time.time - last);
             last = Time.time;
         }
     }
 
-    // A load of variables needed in order to make interpolation work.
+    // A few variables needed in order to make interpolation work.
     private float lastMovementUpdate = 0f;
     private float nextMovementUpdate = 0f;
     private Vector3 lastPosition = Vector3.zero;
@@ -84,9 +102,10 @@ public class GameCharacter : MonoBehaviour {
 
     IEnumerator MovementUpdate()
     {
+        //Initalization
         const float waitPeriod = 1f / MOVEMENT_UPDATES_PER_SECOND;
         lastMovementUpdate = Time.time;
-        yield return new WaitForSeconds(waitPeriod);
+        yield return new WaitForSeconds(waitPeriod); //Wait a bit in order to set up delta time.
 
         while (true)
         {
@@ -103,7 +122,7 @@ public class GameCharacter : MonoBehaviour {
                 lastMovementUpdate = Time.time;
                 nextMovementUpdate = Time.time + waitPeriod;
 
-                yield return new WaitUntil(IsInterpolationFinished);
+                yield return new WaitUntil(DoInterpolation);
             }
             else
             {
@@ -115,15 +134,17 @@ public class GameCharacter : MonoBehaviour {
         }
     }
 
-    private bool IsInterpolationFinished()
+    private bool DoInterpolation()
     {
         float periodLength = nextMovementUpdate - lastMovementUpdate;
-        float t = Mathf.Clamp01((Time.time - lastMovementUpdate) / periodLength);
+        //Calculate the fractional amount (between 0 and 1) of how far along we are in the interpolation.
+        float t = (Time.time - lastMovementUpdate) / periodLength;
 
         //Debug.Log(lastMovementUpdate + " " + Time.time + " " + nextMovementUpdate + " " + t + " " + periodLength);
 
         transform.localPosition = Vector3.Lerp(lastPosition, nextPosition, t);
-        transform.localRotation = Quaternion.Slerp(lastRotiation, nextRotation, t);
+        if (interpolateRotation)
+            transform.localRotation = Quaternion.Slerp(lastRotiation, nextRotation, t);
 
         return (t >= 1f);
     }
