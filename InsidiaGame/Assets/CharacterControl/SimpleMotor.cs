@@ -66,7 +66,7 @@ public class SimpleMotor : MonoBehaviour {
 
         // Apply the inputs //
 
-        //Rotate according to the aim input along the Y-axis.
+        //Rotate according to the aim.x input along the Y-axis.
         transform.Rotate(Vector3.up, aimInput.x);
 
         //Calculate the velocity we need to be moving at using the move input.

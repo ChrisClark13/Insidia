@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Place this on any game object and point it to whatever GameCharacter script needs player input.
+/// Fill in the strings with the names of the input axes from Unity's InputManager.
+/// </summary>
 public class PlayerInput : MonoBehaviour {
 
     public GameCharacter gameCharacter;

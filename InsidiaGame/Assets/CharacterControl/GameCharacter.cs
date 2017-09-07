@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class GameCharacter : MonoBehaviour {
 
-    private const int SLOW_UPDATES_PER_SECOND = 10;
-    private const int FAST_UPDATES_PER_SECOND = 40;
     private const int MOVEMENT_UPDATES_PER_SECOND = 20;
 
     [SerializeField]
@@ -24,66 +22,26 @@ public class GameCharacter : MonoBehaviour {
     /// <summary>
     /// Used for coroutine driven updates.
     /// </summary>
+    /// <param name ="sender">The GameCharacter that's sending the event.</param>
     /// <param name="deltaTime">The amount of time that's passed between each call to this delegate.</param>
     public delegate void OnCoroutineUpdate(GameCharacter sender, float deltaTime);
 
-    /// <summary>
-    /// An event for functions that are expensive and/or don't need to be run very often. Use instead of Update(). Runs 10 times a second.
-    /// </summary>
-    public event OnCoroutineUpdate OnSlowUpdate;
-    /// <summary>
-    /// An event for functions that are cheap and/or need to be run very often. Use instead of Update(). Runs 40 times a second.
-    /// </summary>
-    public event OnCoroutineUpdate OnFastUpdate;
     /// <summary>
     /// An event for functions that move the GameCharacter. Uses interpolation of both position and rotation to smooth out the frames inbetween updates. Runs 20 times a second.<para></para>
     /// Primarily the GameCharacter's position and rotation should be changed by subscribers of this event.
     /// </summary>
     public event OnCoroutineUpdate OnMovementUpdate;
 
-    private Coroutine slowUpdate;
-    private Coroutine fastUpdate;
     private Coroutine movementUpdate;
 
     private void OnEnable()
     {
-        slowUpdate = StartCoroutine(SlowUpdate());
-        fastUpdate = StartCoroutine(FastUpdate());
         movementUpdate = StartCoroutine(MovementUpdate());
     }
 
     private void OnDisable()
     {
-        StopCoroutine(slowUpdate);
-        StopCoroutine(fastUpdate);
         StopCoroutine(movementUpdate);
-    }
-
-    IEnumerator SlowUpdate()
-    {
-        const float waitPeriod = 1f / SLOW_UPDATES_PER_SECOND;
-        float last = Time.time;
-        while (true)
-        {
-            yield return new WaitForSeconds(waitPeriod);
-            if (OnSlowUpdate != null)
-                //Calculate delta time. (The amount of time that has passed between calls to this coroutine.)
-                OnSlowUpdate(this, Time.time - last);
-            last = Time.time;
-        }
-    }
-
-    IEnumerator FastUpdate()
-    {
-        const float waitPeriod = 1f / FAST_UPDATES_PER_SECOND;
-        float last = Time.time;
-        while (true)
-        {
-            yield return new WaitForSeconds(waitPeriod);
-            if (OnFastUpdate != null)
-                OnFastUpdate(this, Time.time - last);
-            last = Time.time;
-        }
     }
 
     // A few variables needed in order to make interpolation work.
