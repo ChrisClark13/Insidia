@@ -5,7 +5,7 @@ using UnityEngine;
 //This script exists both as an example of how to use gameCharacter.Input and to serve as a simple placeholder movement script.
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(GameCharacter))]
-public class SimpleMotor : MonoBehaviour {
+public class InterpolatingMotor : MonoBehaviour {
 
     //Movement control variables.
     public float speed = 5f;
@@ -21,6 +21,20 @@ public class SimpleMotor : MonoBehaviour {
     private CharacterController characterController;
     private GameCharacter gameCharacter;
 
+    //Keep track of the Coroutine that's running for movement.
+    private Coroutine movementCoroutine;
+    private const int MOVEMENT_UPDATES_PER_SECOND = 20;
+
+    // A few variables needed in order to make interpolation work.
+    private float lastMovementUpdate = 0f;
+    private float nextMovementUpdate = 0f;
+    private Vector3 lastPosition = Vector3.zero;
+    private Quaternion lastRotiation = Quaternion.identity;
+    private Vector3 nextPosition = Vector3.zero;
+    private Quaternion nextRotation = Quaternion.identity;
+    private Vector3 lastInterpolatedPosition = Vector3.zero;
+    private Quaternion lastInterpolatedRotation = Quaternion.identity;
+
     public void Awake()
     {
         //Due to the [RequireComponent] attributes on the class itself, it can be garuenteed that this code will work (as long as it's set up through Unity's editor).
@@ -31,28 +45,103 @@ public class SimpleMotor : MonoBehaviour {
     //Runs after Awake, but before Start.
     public void OnEnable()
     {
-        //Subscribe to the delegates we need to in order to make this script work.
-        //The movement update event provided by the GameCharacter class. Runs 20 times a second and interpolates between the results automatically.
-        //You just need to worry about doing all the movement and rotation using a function subscribed to this event if possible.
-        gameCharacter.OnMovementUpdate += Move;
+        movementCoroutine = StartCoroutine(MovementUpdate());
+
         //The input changed event provided for each input in gameCharacter.Input. (See CharacterInputState for how it works.)
         gameCharacter.Input.Jump.OnChange += OnJump;
     }
 
     public void OnDisable()
     {
+        StopCoroutine(movementCoroutine);
+
         //Make sure to unsubcribe your functions when you no longer want their code to run.
         //Otherwise, the code will run even when your script is disabled.
-        gameCharacter.OnMovementUpdate -= Move;
         gameCharacter.Input.Jump.OnChange -= OnJump;
 
         //!! Also make sure to do this otherwise you can crash the game! !!
     }
 
+    /// <summary>
+    /// Disable if the position of the character needs to be controlled by something other than a script running via OnMovementUpdate.
+    /// </summary>
+    [Tooltip("Disable if the position of the character needs to be controlled by something other than a script running via OnMovementUpdate.")]
+    public bool interpolatePosition = true;
+    /// <summary>
+    /// Disable if the rotation of the character needs to be controlled by something other than a script running via OnMovementUpdate.
+    /// </summary>
+    [Tooltip("Disable if the rotation of the character needs to be controlled by something other than a script running via OnMovementUpdate.")]
+    public bool interpolateRotation = true;
+
+    IEnumerator MovementUpdate()
+    {
+        //Initalization
+        const float waitPeriod = 1f / MOVEMENT_UPDATES_PER_SECOND;
+        lastMovementUpdate = Time.time;
+        yield return new WaitForSeconds(waitPeriod); //Wait a bit in order to set up delta time.
+
+        while (true)
+        {
+            //Update tracking variables
+            lastPosition = transform.localPosition;
+            lastRotiation = transform.localRotation;
+
+            //Do the movement
+            Move(Time.time - lastMovementUpdate);
+
+            //Keep track of where we ended up and use that as our goal position.
+            nextPosition = transform.localPosition;
+            nextRotation = transform.localRotation;
+
+            //Reset our current position to where we need to be starting from.
+            transform.localPosition = lastInterpolatedPosition = lastPosition;
+            transform.localRotation = lastInterpolatedRotation = lastRotiation;
+
+            //Set up the timing for the interpolation
+            lastMovementUpdate = Time.time;
+            nextMovementUpdate = Time.time + waitPeriod;
+
+            yield return new WaitUntil(DoInterpolation);
+        }
+    }
+
+    //Does the interpolation and returns true when it's done.
+    //The last place it interpolated to is where the MovementUpdate() code picks up from.
+    //Will stop interpolation if the gameCharacter is suddenly moved.
+    private bool DoInterpolation()
+    {
+        //Cancel the interpolation if our position/rotation was changed by an outside script.
+        if ((interpolatePosition && transform.localPosition != lastInterpolatedPosition) || (interpolateRotation && transform.localRotation != lastInterpolatedRotation))
+            return true;
+
+        //Calculate how long the interpolation needs to last for.
+        float periodLength = nextMovementUpdate - lastMovementUpdate;
+        //And how far along we are in it.
+        float progress = Time.time - lastMovementUpdate;
+
+        //Check to make sure we're not on our first time through the interpolation.
+        if (progress == 0)
+            return false;
+
+        //Calculate the fractional amount (between 0 and 1) of how far along we are in the interpolation.
+        float t = lastMovementUpdate / periodLength;
+
+        //Debug.Log(lastMovementUpdate + " " + Time.time + " " + nextMovementUpdate + " " + t + " " + periodLength);
+        if (interpolatePosition)
+            transform.localPosition = Vector3.Lerp(lastPosition, nextPosition, t);
+        if (interpolateRotation)
+            transform.localRotation = Quaternion.Slerp(lastRotiation, nextRotation, t);
+
+        lastInterpolatedPosition = transform.localPosition;
+        lastInterpolatedRotation = transform.localRotation;
+
+        return (t >= 1f);
+    }
+
     //The function subscribed to the OnMovementUpdate of the gameCharacter.
     //It is given both the gameCharacter that sent the event (just in case you don't already have this info)
     //and the amount of time that has passed since the last call of the event (works just like Time.deltaTime, but only for this event).
-    private void Move(GameCharacter sender, float deltaTime)
+    private void Move(float deltaTime)
     {
         // Fetch the input values from the game character //
         
