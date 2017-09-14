@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//This script exists both as an example of how to use gameCharacter.Input and to serve as a simple placeholder movement script.
+/// <summary>
+/// A script that serves as an incomplete example of how to program movement, but mainly on how to interact with the CharacterInput class and as an example of using interpolation.
+/// To use, simply place on the Dino along with the GameCharacter and CharacterInput scripts then tweak the variables to your liking.
+/// <para>Created by Christian Clark</para>
+/// </summary>
 [RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(GameCharacter))]
+[RequireComponent(typeof(CharacterInput))]
 public class InterpolatingMotor : MonoBehaviour {
 
     //Movement control variables.
     public float speed = 5f;
-    public float sprintSpeed = 10f;
-    public float turnSpeed = 0.1f;
+    public float turnSpeed = 720f;
     public float jumpStrength = 10f;
     public float yVelocity = 0f;
     public float gravity = 10f;
@@ -18,49 +21,22 @@ public class InterpolatingMotor : MonoBehaviour {
     public float terminalVelocity = -20;
 
     //Private caching variables.
-    private CharacterController characterController;
-    private GameCharacter gameCharacter;
+    private CharacterController _characterController;
+    private CharacterInput _characterInput;
 
     //Keep track of the Coroutine that's running for movement.
-    private Coroutine movementCoroutine;
+    private Coroutine _movementCoroutine;
     private const int MOVEMENT_UPDATES_PER_SECOND = 20;
 
     // A few variables needed in order to make interpolation work.
-    private float lastMovementUpdate = 0f;
-    private float nextMovementUpdate = 0f;
-    private Vector3 lastPosition = Vector3.zero;
-    private Quaternion lastRotiation = Quaternion.identity;
-    private Vector3 nextPosition = Vector3.zero;
-    private Quaternion nextRotation = Quaternion.identity;
-    private Vector3 lastInterpolatedPosition = Vector3.zero;
-    private Quaternion lastInterpolatedRotation = Quaternion.identity;
-
-    public void Awake()
-    {
-        //Due to the [RequireComponent] attributes on the class itself, it can be garuenteed that this code will work (as long as it's set up through Unity's editor).
-        characterController = GetComponent<CharacterController>();
-        gameCharacter = GetComponent<GameCharacter>();
-    }
-
-    //Runs after Awake, but before Start.
-    public void OnEnable()
-    {
-        movementCoroutine = StartCoroutine(MovementUpdate());
-
-        //The input changed event provided for each input in gameCharacter.Input. (See CharacterInputState for how it works.)
-        gameCharacter.Input.Jump.OnChange += OnJump;
-    }
-
-    public void OnDisable()
-    {
-        StopCoroutine(movementCoroutine);
-
-        //Make sure to unsubcribe your functions when you no longer want their code to run.
-        //Otherwise, the code will run even when your script is disabled.
-        gameCharacter.Input.Jump.OnChange -= OnJump;
-
-        //!! Also make sure to do this otherwise you can crash the game! !!
-    }
+    private float _lastMovementUpdate = 0f;
+    private float _nextMovementUpdate = 0f;
+    private Vector3 _lastPosition = Vector3.zero;
+    private Quaternion _lastRotiation = Quaternion.identity;
+    private Vector3 _nextPosition = Vector3.zero;
+    private Quaternion _nextRotation = Quaternion.identity;
+    private Vector3 _lastInterpolatedPosition = Vector3.zero;
+    private Quaternion _lastInterpolatedRotation = Quaternion.identity;
 
     /// <summary>
     /// Disable if the position of the character needs to be controlled by something other than a script running via OnMovementUpdate.
@@ -73,33 +49,59 @@ public class InterpolatingMotor : MonoBehaviour {
     [Tooltip("Disable if the rotation of the character needs to be controlled by something other than a script running via OnMovementUpdate.")]
     public bool interpolateRotation = true;
 
+    //Cache references to the CharacterController component and the gameCharacter script.
+    public void Awake()
+    {
+        //Due to the [RequireComponent] attributes on the class itself, it can be garenteed that this code will work (as long as it's set up through Unity's editor).
+        _characterController = GetComponent<CharacterController>();
+        _characterInput = GetComponent<CharacterInput>();
+    }
+
+    //Runs after Awake, but before Start.
+    public void OnEnable()
+    {
+        _movementCoroutine = StartCoroutine(MovementUpdate());
+
+        //Subscribe to the Jump input's delegate
+        _characterInput.Jump.OnChange += OnJump;
+    }
+
+    public void OnDisable()
+    {
+        StopCoroutine(_movementCoroutine);
+
+        //Make sure to unsubscribe or else you can cause the program to crash.
+        _characterInput.Jump.OnChange -= OnJump;
+    }
+
+    //Handles timing of the call to the Move() function and setting up the interpolation.
     IEnumerator MovementUpdate()
     {
         //Initalization
         const float waitPeriod = 1f / MOVEMENT_UPDATES_PER_SECOND;
-        lastMovementUpdate = Time.time;
+        _lastMovementUpdate = Time.time;
         yield return new WaitForSeconds(waitPeriod); //Wait a bit in order to set up delta time.
 
         while (true)
         {
             //Update tracking variables
-            lastPosition = transform.localPosition;
-            lastRotiation = transform.localRotation;
+            _lastPosition = transform.localPosition;
+            _lastRotiation = transform.localRotation;
 
             //Do the movement
-            Move(Time.time - lastMovementUpdate);
+            Move(Time.time - _lastMovementUpdate);
 
             //Keep track of where we ended up and use that as our goal position.
-            nextPosition = transform.localPosition;
-            nextRotation = transform.localRotation;
+            _nextPosition = transform.localPosition;
+            _nextRotation = transform.localRotation;
 
             //Reset our current position to where we need to be starting from.
-            transform.localPosition = lastInterpolatedPosition = lastPosition;
-            transform.localRotation = lastInterpolatedRotation = lastRotiation;
+            transform.localPosition = _lastInterpolatedPosition = _lastPosition;
+            transform.localRotation = _lastInterpolatedRotation = _lastRotiation;
 
             //Set up the timing for the interpolation
-            lastMovementUpdate = Time.time;
-            nextMovementUpdate = Time.time + waitPeriod;
+            _lastMovementUpdate = Time.time;
+            _nextMovementUpdate = Time.time + waitPeriod;
 
             yield return new WaitUntil(DoInterpolation);
         }
@@ -111,29 +113,29 @@ public class InterpolatingMotor : MonoBehaviour {
     private bool DoInterpolation()
     {
         //Cancel the interpolation if our position/rotation was changed by an outside script.
-        if ((interpolatePosition && transform.localPosition != lastInterpolatedPosition) || (interpolateRotation && transform.localRotation != lastInterpolatedRotation))
+        if ((interpolatePosition && transform.localPosition != _lastInterpolatedPosition) || (interpolateRotation && transform.localRotation != _lastInterpolatedRotation))
             return true;
 
         //Calculate how long the interpolation needs to last for.
-        float periodLength = nextMovementUpdate - lastMovementUpdate;
+        float periodLength = _nextMovementUpdate - _lastMovementUpdate;
         //And how far along we are in it.
-        float progress = Time.time - lastMovementUpdate;
+        float progress = Time.time - _lastMovementUpdate;
 
         //Check to make sure we're not on our first time through the interpolation.
         if (progress == 0)
             return false;
 
         //Calculate the fractional amount (between 0 and 1) of how far along we are in the interpolation.
-        float t = lastMovementUpdate / periodLength;
+        float t = _lastMovementUpdate / periodLength;
 
         //Debug.Log(lastMovementUpdate + " " + Time.time + " " + nextMovementUpdate + " " + t + " " + periodLength);
         if (interpolatePosition)
-            transform.localPosition = Vector3.Lerp(lastPosition, nextPosition, t);
+            transform.localPosition = Vector3.Lerp(_lastPosition, _nextPosition, t);
         if (interpolateRotation)
-            transform.localRotation = Quaternion.Slerp(lastRotiation, nextRotation, t);
+            transform.localRotation = Quaternion.Slerp(_lastRotiation, _nextRotation, t);
 
-        lastInterpolatedPosition = transform.localPosition;
-        lastInterpolatedRotation = transform.localRotation;
+        _lastInterpolatedPosition = transform.localPosition;
+        _lastInterpolatedRotation = transform.localRotation;
 
         return (t >= 1f);
     }
@@ -145,26 +147,18 @@ public class InterpolatingMotor : MonoBehaviour {
     {
         // Fetch the input values from the game character //
         
-        //Are we sprinting?
-        float _speed = (gameCharacter.Input.Sprint) ? sprintSpeed : speed;
         //What is our current move input?
-        Vector2 moveInput = gameCharacter.Input.Move;
+        Vector3 moveInput = new Vector3(_characterInput.Move.Value.x, 0, _characterInput.Move.Value.y);
         moveInput.Normalize();
-        //Alternative way of fetching input.
-        Vector2 aimInput = gameCharacter.Input.Aim.Value * turnSpeed;
 
         // Apply the inputs //
 
-        //Rotate according to the aim.x input along the Y-axis.
-        transform.Rotate(Vector3.up, aimInput.x);
-
         //Calculate the velocity we need to be moving at using the move input.
-        Vector3 velocity = Vector3.zero;
-        velocity.x = _speed * moveInput.x;
-        velocity.z = _speed * moveInput.y;
+        Vector3 velocity = moveInput * speed;
 
-        //Rotate the velocity according to our current rotation.
-        velocity = transform.localRotation * velocity;
+        //Rotate to face the input.
+        if (moveInput != Vector3.zero)
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.LookRotation(moveInput, transform.up), turnSpeed * deltaTime);
 
         // Calucate physics //
 
@@ -181,12 +175,12 @@ public class InterpolatingMotor : MonoBehaviour {
         // Apply physics //
 
         //Move according to our velocity (which is in speed per second so use deltaTime).
-        characterController.Move(velocity * deltaTime);
+        _characterController.Move(velocity * deltaTime);
 
         // Resolve movement collisions //
 
         //Check to see if we collided with the ground.
-        if ((characterController.collisionFlags & CollisionFlags.Below) != 0)
+        if ((_characterController.collisionFlags & CollisionFlags.Below) != 0)
         {
             //If we collided with the ground, then we're grounded.
             grounded = true;
@@ -202,7 +196,7 @@ public class InterpolatingMotor : MonoBehaviour {
     //the Jump input changes from off to on or on to off (is pressed or released).
     //This function exists because otherwise the input of the jump button being pressed could be missed (making for laggy controls)
     //and because if this was being checked in Move() the player could jump repeatedly by holding the button down.
-    private void OnJump(bool input)
+    private void OnJump(CharacterInput charInput, bool input)
     {
         //Only jump if the Jump input changed from off to on (was pressed) and we're on the ground.
         if (input && grounded)
