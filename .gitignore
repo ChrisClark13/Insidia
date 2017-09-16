@@ -32,3 +32,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 *.DS_Store
+
+*.ide
