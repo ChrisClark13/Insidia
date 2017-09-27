@@ -12,6 +12,7 @@ using UnityEngine;
 /// How to unsubscribe to an input delegate: "gameCharacter.Input.[input name].OnChange -= [subscriber function];"<para></para>
 /// Created by Christian Clark
 /// </summary>
+[DefaultExecutionOrder(-100)]
 public class CharacterInput : MonoBehaviour
 {
     [Serializable]
@@ -66,7 +67,7 @@ public class CharacterInput : MonoBehaviour
     private Input<bool> _lockOn;
     public Input<bool> LockOn { get { return _lockOn; } }
 
-    private void Awake()
+    public void Awake()
     {
         _move = new Input<Vector2>(this);
         _aimPoint = new Input<Vector3>(this);
