@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Points for AI charaters using the <see cref="AIBrainWander"/> script to follow. Only place one in a Scene and fill out its Points list with Transforms.
+/// Created by Christian Clark
+/// </summary>
 public class AIWanderPoints : MonoBehaviour {
 
 	public static Transform[] Points

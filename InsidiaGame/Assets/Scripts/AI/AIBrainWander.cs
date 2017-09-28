@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Slap this on any AI that needs to wander around. Place a single <see cref="AIWanderPoints"/> script in the Scene and set that up. Then this script will make the AI randomly go between those points.
+/// Created by Christian Clark
+/// </summary>
 [RequireComponent(typeof(AICharMovement))]
 public class AIBrainWander : MonoBehaviour {
 

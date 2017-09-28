@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Slap this on any AI Character that needs to dumbly follow a Player around. Once the Player gets within the <see cref="scanRadius"/> it will follow that Player until this script is disabled.
+/// Created by Christian Clark
+/// </summary>
 [RequireComponent(typeof(AICharMovement))]
 public class AIBrainFollowPlayer : MonoBehaviour {
 
