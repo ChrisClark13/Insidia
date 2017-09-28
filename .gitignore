@@ -34,3 +34,7 @@ sysinfo.txt
 *.DS_Store
 
 InsidiaGame/\.vs/
+
+InsidiaGame/Assets/ProCore/
+
+InsidiaGame/Assets/ProCore\.meta
