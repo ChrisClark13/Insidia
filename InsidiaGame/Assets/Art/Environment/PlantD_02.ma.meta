@@ -1,0 +1,181 @@
+fileFormatVersion: 2
+guid: cc9c52a240bcad445a48ad97309825dc
+timeCreated: 1506563842
+licenseType: Free
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: back
+    100002: Flower_01
+    100004: Flower_02
+    100006: Flower_03
+    100008: Leaf_01
+    100010: Leaf_01 1
+    100012: Leaf_01 2
+    100014: Leaf_02
+    100016: Leaf_02 1
+    100018: Leaf_02 2
+    100020: Leaf_03
+    100022: Leaf_03 1
+    100024: Leaf_03 2
+    100026: Leaf_04
+    100028: Leaf_04 1
+    100030: Leaf_04 2
+    100032: Leaf_05
+    100034: Leaf_05 1
+    100036: Leaf_05 2
+    100038: Leaf_06
+    100040: Plant
+    100042: //RootNode
+    400000: back
+    400002: Flower_01
+    400004: Flower_02
+    400006: Flower_03
+    400008: Leaf_01
+    400010: Leaf_01 1
+    400012: Leaf_01 2
+    400014: Leaf_02
+    400016: Leaf_02 1
+    400018: Leaf_02 2
+    400020: Leaf_03
+    400022: Leaf_03 1
+    400024: Leaf_03 2
+    400026: Leaf_04
+    400028: Leaf_04 1
+    400030: Leaf_04 2
+    400032: Leaf_05
+    400034: Leaf_05 1
+    400036: Leaf_05 2
+    400038: Leaf_06
+    400040: Plant
+    400042: //RootNode
+    2000000: back
+    2300000: Leaf_01
+    2300002: Leaf_01 1
+    2300004: Leaf_01 2
+    2300006: Leaf_02
+    2300008: Leaf_02 1
+    2300010: Leaf_02 2
+    2300012: Leaf_03
+    2300014: Leaf_03 1
+    2300016: Leaf_03 2
+    2300018: Leaf_04
+    2300020: Leaf_04 1
+    2300022: Leaf_04 2
+    2300024: Leaf_05
+    2300026: Leaf_05 1
+    2300028: Leaf_05 2
+    2300030: Leaf_06
+    2300032: Plant
+    2300034: //RootNode
+    3300000: Leaf_01
+    3300002: Leaf_01 1
+    3300004: Leaf_01 2
+    3300006: Leaf_02
+    3300008: Leaf_02 1
+    3300010: Leaf_02 2
+    3300012: Leaf_03
+    3300014: Leaf_03 1
+    3300016: Leaf_03 2
+    3300018: Leaf_04
+    3300020: Leaf_04 1
+    3300022: Leaf_04 2
+    3300024: Leaf_05
+    3300026: Leaf_05 1
+    3300028: Leaf_05 2
+    3300030: Leaf_06
+    3300032: Plant
+    3300034: //RootNode
+    4300000: Plant
+    4300002: Leaf_01
+    4300004: Leaf_02
+    4300006: Leaf_03
+    4300008: Leaf_04
+    4300010: Leaf_05
+    4300012: Leaf_01
+    4300014: Leaf_02
+    4300016: Leaf_03
+    4300018: Leaf_04
+    4300020: Leaf_05
+    4300022: Leaf_01
+    4300024: Leaf_02
+    4300026: Leaf_03
+    4300028: Leaf_04
+    4300030: Leaf_05
+    4300032: Leaf_06
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
