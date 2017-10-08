@@ -149,7 +149,8 @@ public class InterpolatingMotor : MonoBehaviour {
         
         //What is our current move input?
         Vector3 moveInput = new Vector3(_characterInput.Move.Value.x, 0, _characterInput.Move.Value.y);
-        moveInput.Normalize();
+        if (moveInput.magnitude > 1f)
+            moveInput.Normalize();
 
         // Apply the inputs //
 

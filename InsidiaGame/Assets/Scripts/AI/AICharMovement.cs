@@ -160,6 +160,8 @@ public class AICharMovement : MonoBehaviour {
         moveInput.y = 0;
         moveInput.Normalize();
 
+        moveInput *= (_agent.desiredVelocity.magnitude / _agent.speed);
+
         _charInput.Move.Value = new Vector2(moveInput.x, moveInput.z);
    }
 
