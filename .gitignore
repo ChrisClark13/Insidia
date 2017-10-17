@@ -34,3 +34,5 @@ sysinfo.txt
 *.DS_Store
 
 InsidiaGame/\.vs/
+
+InsidiaGameNetwork/\.vs/
