@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aff6c8c49daece498f4c28b3faef2e5, type: 3}
+  m_Name: Default Aggro Profile
+  m_EditorClassIdentifier: 
+  initialInRange: 100
+  initialOutOfRange: 50
+  attackThreshold: 20
+  maxAggro: 500
+  checkLossPerMeter: 5
+  aggroPerDamageMultiplier: 0.1
+  randomVariance: 1
+  targetTagMultipliers:
+  - tag: AI Friendly
+    multiplier: 1.2
+  - tag: AI Neutral
+    multiplier: 1
+  - tag: AI Hostile
+    multiplier: 1
+  - tag: Player
+    multiplier: 0.5
+  defaultTargetMultiplier: 0.25
+  selfOutOfRangeDecayMin: 15
+  selfOutOfRangeDecayMax: 100
+  selfMaxDecayDistance: 30
+  soloRange: 10
+  soloDecayRate: 5
+  outOfRangeDecayMin: 10
+  outOfRangeDecayMax: 50
+  targetMaxDecayDistance: 20
+  targetAttackedSelf: 50
+  selfAttackedTarget: 10
+  targetAttackedFriend: 10
+  friendAttackedTarget: -10
+  targetAttackedLeader: 20
+  leaderAttackedTarget: 10
+  targetKilledFriend: 20
+  targetKilledLeader: 40

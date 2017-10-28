@@ -8,15 +8,19 @@ public class MinionSquad : MonoBehaviour, ISensorListener {
 
     public List<Minion> minions = new List<Minion>();
     public int capacity = 10;
-    public List<GameObject> targets;
     public TriggerSensor2 targetSensor;
     public SquadFormation formation;
     public float range = 20f;
-    static public Action alone;
+
+    public event Action<MinionSquad, GameObject> TargetAdded;
 
     private void Start()
     {
         targetSensor.Setup(this, TargetFilter);
+        foreach (var minion in minions)
+        {
+            minion.ChangeSquad(this);
+        }
     }
 
     protected virtual bool TargetFilter(GameObject other)
@@ -37,12 +41,12 @@ public class MinionSquad : MonoBehaviour, ISensorListener {
 
     private void OnEnable()
     {
-        foreach(var minion in minions)
-        {
-            minion.ChangeSquad(this);
-        }
-
         StartCoroutine(this.UpdateCoroutine(30f, SquadUpdate));
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 
     private List<Minion> GetMinionsInState(Minion.State state)
@@ -52,30 +56,31 @@ public class MinionSquad : MonoBehaviour, ISensorListener {
 
     private void SquadUpdate()
     {
-        List<GameObject> targetsToRemove = new List<GameObject>(targets.Count);
-        foreach (var target in targets)
-        {
-            if ((target.transform.position - transform.position).sqrMagnitude > (range * range))
-                targetsToRemove.Add(target);
-        }
-        targetsToRemove.ForEach(t => targets.Remove(t));
+        //List<GameObject> targetsToRemove = new List<GameObject>(targets.Count);
+        //foreach (var target in targets)
+        //{
+        //    if ((target.transform.position - transform.position).sqrMagnitude > (range * range))
+        //        targetsToRemove.Add(target);
+        //}
+        //targetsToRemove.ForEach(t => targets.Remove(t));
 
-        //If there's something to attack...
-        if(targetSensor.sensedObjects.Count > 0)
-        {
-            foreach (var minion in GetMinionsInState(Minion.State.Follow))
-            {
-                //... tell the minions to attack!!
-                minion.state = Minion.State.Attack;
-            }
-        }
+        ////If there's something to attack...
+        //if(targetSensor.sensedObjects.Count > 0)
+        //{
+        //    foreach (var minion in GetMinionsInState(Minion.State.Follow))
+        //    {
+        //        //... tell the minions to attack!!
+        //        minion.state = Minion.State.Attack;
+        //    }
+        //}
         
         formation.SetMinionGoalsToPositions(transform, GetMinionsInState(Minion.State.Follow));
     }
 
     public void OnSensorEnter(TriggerSensor2 sensor, GameObject other)
     {
-        targets.Add(other);
+        if (TargetAdded != null)
+            TargetAdded(this, other);
     }
 
     public void OnSensorExit(TriggerSensor2 sensor, GameObject other)

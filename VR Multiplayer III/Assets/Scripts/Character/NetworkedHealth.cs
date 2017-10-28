@@ -59,7 +59,7 @@ public class NetworkedHealth : NetworkBehaviour {
         _health = Mathf.Clamp(_health + changeAmount, 0, _maxHealth);
         if (initalAmount != _health)
         {
-            OnHealthChanged(source, initalAmount - _health);
+            OnHealthChanged(source, _health - initalAmount);
         }
     }
 
@@ -71,7 +71,7 @@ public class NetworkedHealth : NetworkBehaviour {
         _health = value;
         if (initalAmount != _health)
         {
-            OnHealthChanged(source, initalAmount - _health);
+            OnHealthChanged(source, _health - initalAmount);
         }
     }
 
@@ -97,7 +97,7 @@ public class NetworkedHealth : NetworkBehaviour {
         _maxHealth = value;
         if (initalAmount != _health)
         {
-            OnMaxHealthChanged(source, _maxHealth - initalAmount);
+            OnMaxHealthChanged(source, initalAmount - _maxHealth);
         }
     }
 
