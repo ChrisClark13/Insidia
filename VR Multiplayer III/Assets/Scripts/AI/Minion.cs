@@ -194,6 +194,10 @@ public class Minion : MonoBehaviour {
                     //Go straight to the next target in the list.
                     continue;
                 }
+                else if (!target.activeInHierarchy)
+                {
+                    aggroDict.Remove(target);
+                }
                 else
                 {
                     //Don't target dead things
